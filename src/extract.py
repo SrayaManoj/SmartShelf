@@ -79,15 +79,35 @@ def extract_text(file_path: str) -> str:
 
 
 # --------- Test Run ----------
+# --------- Test Run ----------
 if __name__ == "__main__":
     import sys
-    if len(sys.argv) > 1:
-        file = sys.argv[1]
-        if os.path.exists(file):
-            print(f"\nExtracting from: {file}")
-            print(extract_text(file)[:300])  # print first 300 chars
-        else:
-            print(f"[WARN] File not found: {file}")
-    else:
+
+    if len(sys.argv) < 2:
         print("Usage: python src/extract.py <file_path>")
+        sys.exit(1)
+
+    file_path = sys.argv[1]
+    if not os.path.exists(file_path):
+        print(f"[ERROR] File not found: {file_path}")
+        sys.exit(1)
+
+    # Extract the text
+    extracted_text = extract_text(file_path)
+
+    if extracted_text:
+        # Make sure processed/ folder exists
+        os.makedirs("processed", exist_ok=True)
+
+        # Build output filename (same name as input, but .txt)
+        base_name = os.path.splitext(os.path.basename(file_path))[0]
+        out_file = os.path.join("processed", base_name + ".txt")
+
+        # Save to processed/ folder
+        with open(out_file, "w", encoding="utf-8") as f:
+            f.write(extracted_text)
+
+        print(f"[INFO] Extracted text saved to: {out_file}")
+    else:
+        print("[WARN] No text extracted.")
 
